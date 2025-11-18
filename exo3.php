@@ -1,11 +1,50 @@
 <?php
-$chaine = "Bonjour chef";
  
-function my_strrev($chaine) {
-    $inverse = '';
-    for ($i = strlen($chaine) - 1; $i >= 0; $i--) {
-        $inverse .= $chaine[$i];
+function my_str_contains($phrase, $mot) {
+
+    $longueurPhrase = strlen($phrase);
+
+    $longueurMot = strlen($mot);
+ 
+    if ($longueurMot === 0) return true; 
+
+    if ($longueurMot > $longueurPhrase) return false;
+ 
+    for ($position = 0; $position <= ($longueurPhrase - $longueurMot); $position++) {
+
+        $estIdentique = true;
+ 
+        for ($i = 0; $i < $longueurMot; $i++) {
+
+            if ($phrase[$position + $i] !== $mot[$i]) {
+
+                $estIdentique = false;
+
+                break;
+
+            }
+
+        }
+ 
+        if ($estIdentique) {
+
+            return true;
+
+        }
+
     }
-    return $inverse;
+ 
+    return false;
+
 }
-echo my_strrev($chaine);
+ 
+$texte = "Il fait beau";
+
+if (my_str_contains($texte, "beau")) {
+
+    echo "Trouvé !";
+
+}
+ 
+?>
+ 
