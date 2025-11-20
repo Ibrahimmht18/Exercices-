@@ -1,0 +1,17 @@
+<?php
+session_start();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $_SESSION['username'] = $_POST['username'];
+}
+
+if (!isset($_SESSION['username'])) {
+    echo '<form method="post">
+            <label>Username :</label>
+            <input type="text" name="username">
+            <button type="submit">Valider</button>
+          </form>';
+} else {
+    echo 'Bonjour ' . htmlspecialchars($_SESSION['username']);
+}
+?>
