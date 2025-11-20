@@ -1,0 +1,19 @@
+<?php
+$eleves = [
+    ["nom" => "Alice", "notes" => [15, 14, 16]],
+    ["nom" => "Bob", "notes" => [12, 10, 11]],
+    ["nom" => "Claire", "notes" => [18, 17, 16]]
+];
+
+foreach ($eleves as $eleve) {
+    $somme = 0;
+    $nb_notes = count($eleve["notes"]);
+
+    for ($i = 0; $i < $nb_notes; $i++) {
+        $somme += $eleve["notes"][$i];
+    }
+
+    $moyenne = $somme / $nb_notes;
+    echo $eleve["nom"] . " a une moyenne de " . $moyenne . "<br>";
+}
+?>

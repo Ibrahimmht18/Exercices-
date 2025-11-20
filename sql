@@ -1,0 +1,7 @@
+CREATE TABLE `100` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `nom` VARCHAR(100) NOT NULL,
+    `pays` CHAR(3) NOT NULL,
+    `course` VARCHAR(255) NOT NULL,
+    `temps` FLOAT NOT NULL
+);

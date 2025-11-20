@@ -1,0 +1,78 @@
+<?php
+require 'config.php';
+
+// Pagination
+$limit = 10;
+$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+$offset = ($page - 1) * $limit;
+
+// Recherche
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+
+// Requête principale avec recherche
+$sql = "SELECT * FROM `100` WHERE nom LIKE :search ORDER BY course, temps ASC LIMIT :offset, :limit";
+$sth = $dbh->prepare($sql);
+$sth->bindValue(':search', "%$search%", PDO::PARAM_STR);
+$sth->bindValue(':offset', $offset, PDO::PARAM_INT);
+$sth->bindValue(':limit', $limit, PDO::PARAM_INT);
+$sth->execute();
+$results = $sth->fetchAll(PDO::FETCH_ASSOC);
+
+// Récupérer toutes les courses pour le classement
+$courses = [];
+foreach ($results as $row) {
+    $courses[$row['course']][] = $row;
+}
+
+// Classement par course
+foreach ($courses as $course => &$coureurs) {
+    usort($coureurs, fn($a, $b) => $a['temps'] <=> $b['temps']);
+    foreach ($coureurs as $i => &$coureur) {
+        $coureur['rank'] = $i + 1;
+    }
+}
+?>
+
+<form method="get">
+    <input type="text" name="search" placeholder="Rechercher un nom" value="<?= htmlspecialchars($search) ?>">
+    <button type="submit">Rechercher</button>
+</form>
+
+<table border="1">
+    <tr>
+        <th>Nom</th>
+        <th>Pays</th>
+        <th>Course</th>
+        <th>Temps</th>
+        <th>Classement</th>
+        <th>Modifier</th>
+    </tr>
+    <?php foreach ($results as $row): ?>
+        <tr>
+            <td><?= htmlspecialchars($row['nom']) ?></td>
+            <td><?= htmlspecialchars($row['pays']) ?></td>
+            <td><?= htmlspecialchars($row['course']) ?></td>
+            <td><?= htmlspecialchars($row['temps']) ?></td>
+            <td>
+                <?php
+                $rank = array_filter($courses[$row['course']], fn($c) => $c['nom'] === $row['nom'] && $c['temps'] === $row['temps']);
+                echo reset($rank)['rank'] ?? '-';
+                ?>
+            </td>
+            <td><a href="edit.php?id=<?= $row['id'] ?>">Modifier</a></td>
+        </tr>
+    <?php endforeach; ?>
+</table>
+
+<?php
+// Pagination liens
+$sth = $dbh->prepare("SELECT COUNT(*) FROM `100` WHERE nom LIKE :search");
+$sth->bindValue(':search', "%$search%", PDO::PARAM_STR);
+$sth->execute();
+$total = $sth->fetchColumn();
+$pages = ceil($total / $limit);
+
+for ($i = 1; $i <= $pages; $i++) {
+    echo "<a href='?page=$i&search=" . urlencode($search) . "'>$i</a> ";
+}
+?>
